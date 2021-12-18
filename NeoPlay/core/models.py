@@ -1,28 +1,26 @@
 from django.db import models
-
+from django.contrib.auth.models import User # Модель базового пользователя джанго
 # Create your models here.
 
 
-class UserModel (models.Model):
-    id: models.PositiveIntegerField(unique=True, primary_key=True)
-    user_name: models.CharField(max_length=50, unique=True)
-    name: models.CharField(max_length=50)
-    surname: models.CharField(max_length=50, blank=True)
-    email: models.EmailField(unique=True)
-    password: models.CharField(max_length=30)
+class EventModel(models.Model):
+    name = models.CharField(max_length=150, unique=True)
+    game = models.PositiveSmallIntegerField()
+    date = models.DateTimeField()
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    description = models.TextField(max_length=2000)
+    status = models.PositiveSmallIntegerField()
+    recording = models.URLField()
+
+    def get_participants(self):
+        return EventUser.objects.filter(event=self)
+
+class EventUser(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    event = models.ForeignKey(EventModel, on_delete=models.CASCADE)
 
 
-class EventModel (models.Model):
-    id: models.PositiveIntegerField(unique=True, primary_key=True)
-    name: models.CharField(max_length=150, unique=True)
-    game_id: models.PositiveSmallIntegerField()
-    date: models.DateTimeField()
-    author_id: UserModel.id()
-    description: models.TextField(max_length=2000)
-    status: models.PositiveSmallIntegerField()
-    recording: models.URLField()
 
 
-class UserEvent (models.Model):
-    user_id: UserModel.id
-    event_id: EventModel.id
+
+
